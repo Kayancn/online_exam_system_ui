@@ -13,8 +13,9 @@
       <span>王小虎</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item>个人信息</el-dropdown-item>
-        <el-dropdown-item>退出</el-dropdown-item>
-        <el-dropdown-item>删除</el-dropdown-item>
+        <el-dropdown-item>
+          <router-link to="/" style="text-decoration: none">退出</router-link>
+        </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </div>

@@ -11,7 +11,7 @@
       <img src="../assets/logo.png" alt="" style="width: 20px; position: relative; top: 5px">
       <b style="color:white; margin-left: 5px" v-show="logoTextShow">考试与练习平台</b>
     </div>
-    <el-menu-item index="/">
+    <el-menu-item index="/manage/home">
       <i class="el-icon-house"></i>
       <span slot="title">主页</span>
     </el-menu-item>
@@ -30,7 +30,7 @@
       <el-menu-item index="3-2">题目管理</el-menu-item>
     </el-submenu>
 
-    <el-menu-item index="/student">
+    <el-menu-item index="/manage/student">
       <i class="el-icon-s-custom"></i>
       <span slot="title">学生管理</span>
     </el-menu-item>
