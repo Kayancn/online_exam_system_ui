@@ -51,18 +51,22 @@ export default {
         if (valid) {  // 表单校验合法
           if(this.role === 'student'){
             this.request.post("/student/login", this.logger).then(res => {
-              if(!res) {
-                this.$message.error("账号错误")
-              } else {
+              if(res.code === '200') {
+                localStorage.setItem("logger",JSON.stringify(res.data)) //存储用户信息到浏览器
                 this.$router.push("/exam")
+                this.$message.success("登录成功")
+              } else {
+                this.$message.error(res.msg)
               }
             })
           } else {
             this.request.post("/teacher/login", this.logger).then(res => {
-              if(!res) {
-                this.$message.error("账号错误")
-              } else {
+              if(res.code === '200') {
+                localStorage.setItem("logger",JSON.stringify(res.data)) //存储用户信息到浏览器
                 this.$router.push("/manage")
+                this.$message.success("登录成功")
+              } else {
+                this.$message.error(res.msg)
               }
             })
           }
