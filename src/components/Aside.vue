@@ -26,8 +26,9 @@
         <i class="el-icon-setting"></i>
         <span slot="title">资源管理</span>
       </template>
+      <el-menu-item index="/manage/course">课程管理</el-menu-item>
       <el-menu-item index="3-1">试卷管理</el-menu-item>
-      <el-menu-item index="3-2">题目管理</el-menu-item>
+      <el-menu-item index="/manage/question">题目管理</el-menu-item>
     </el-submenu>
 
     <el-menu-item index="/manage/student">

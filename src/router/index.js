@@ -10,18 +10,12 @@ const routes = [
     component: () => import('../views/Manage.vue'),
     redirect: "/manage/home",
     children: [
+      { path: 'manager', name: '个人信息', component: () => import('../views/Manager.vue')},
       { path: 'home', name: '主页', component: () => import('../views/Home.vue')},
+      { path: 'course', name: '课程管理', component: () => import('../views/Course.vue')},
+      { path: 'question', name: '题目管理', component: () => import('../views/Question.vue')},
       { path: 'student', name: '学生管理', component: () => import('../views/Student.vue')},
-      { path: 'manager', name: '个人信息', component: () => import('../views/Manager.vue')}
     ]
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
     path: '/',
