@@ -9,10 +9,12 @@
         <el-breadcrumb-item>{{ this.$route.name }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <el-dropdown style="width:70px; cursor:pointer" >
+    <el-dropdown style="width:150px; cursor:pointer; text-align: right" >
       <span>{{logger.name}}</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>个人信息</el-dropdown-item>
+        <el-dropdown-item>
+          <router-link to="/manage/manager" style="color: black; text-decoration:none">个人信息</router-link>
+        </el-dropdown-item>
         <el-dropdown-item>
           <span style="text-decoration: none" @click="logout">退出</span>
         </el-dropdown-item>

@@ -11,7 +11,8 @@ const routes = [
     redirect: "/manage/home",
     children: [
       { path: 'home', name: '主页', component: () => import('../views/Home.vue')},
-      { path: 'student', name: '学生管理', component: () => import('../views/Student.vue')}
+      { path: 'student', name: '学生管理', component: () => import('../views/Student.vue')},
+      { path: 'manager', name: '个人信息', component: () => import('../views/Manager.vue')}
     ]
   },
   {
