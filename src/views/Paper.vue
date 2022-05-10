@@ -35,9 +35,10 @@
       <el-table-column prop="duration" label="时长(分)">
       </el-table-column>
 
-      <el-table-column label="操作" width="380">
+      <el-table-column label="操作" width="500">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="takePaper(scope.row.id,scope.row.courseId)">组卷<i class="el-icon-document"></i></el-button>
+          <el-button type="default" size="mini" @click="handlePaper(scope.row.id,scope.row.courseId)">手动组卷<i class="el-icon-document"></i></el-button>
+          <el-button type="default" size="mini" @click="takePaper(scope.row.id,scope.row.courseId)">自动组卷<i class="el-icon-document"></i></el-button>
           <el-button type="primary" size="mini" @click="viewPaper(scope.row.id)">查看试卷<i class="el-icon-document"></i></el-button>
           <el-button type="success" size="mini" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit"></i></el-button>
           <el-popconfirm
@@ -66,7 +67,25 @@
       </el-pagination>
     </div>
 
-    <el-dialog title="题目信息" :visible.sync="dialogFormVisible2" width="60%">
+    <el-dialog title="手动组卷信息" :visible.sync="dialogFormVisible3" width="45%">
+        <div style="width: 800px; padding-left: 100px">
+          <el-transfer
+              filter-placeholder="请输入题目类型：1（选择）、2（判断）、3（问答）"
+              filterable
+              filter-method="filterMethod"
+              :titles="['题库','已选']"
+              v-model="form2.handleQuestionIds"
+              :data="paperQuestions"
+              :props="{key: 'id',label: 'name'}"></el-transfer>
+        </div>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible3 = false">取 消</el-button>
+        <el-button type="primary" @click="generateHandPaper">生 成 试 卷</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="试卷题目信息" :visible.sync="dialogFormVisible2" width="60%">
       <el-card>
         <div v-for="(item, index) in questions" :key="item.id" style="margin: 20px 0">
           <div style="margin: 10px 0; font-size: 20px"><span>{{index + 1}}. </span>{{item.name}}
@@ -91,7 +110,7 @@
       </el-card>
     </el-dialog>
 
-    <el-dialog title="组卷信息" :visible.sync="dialogFormVisible1" width="20%">
+    <el-dialog title="自动组卷信息" :visible.sync="dialogFormVisible1" width="20%">
       <el-form label-width="100px" size="small">
         <el-form-item label="选择题数量">
           <el-input v-model="form1.type1" autocomplete="off"></el-input>
@@ -149,11 +168,14 @@ export default {
       dialogFormVisible: false,
       dialogFormVisible1: false,
       dialogFormVisible2: false,
+      dialogFormVisible3: false,
       form: {},
       form1: {},
+      form2: {},
       multipleSelection: [],
       courses: [],
-      questions: []
+      questions: [],
+      paperQuestions: []
     }
   },
   created() {
@@ -163,6 +185,18 @@ export default {
     })
   },
   methods: {
+    handlePaper(paperId,courseId) {
+      this.request.get("/question").then(res => {
+        this.paperQuestions = res.filter(v => v.courseId === courseId)
+        this.type = null
+      })
+      this.form2 = {handleQuestionIds: [], paperId: paperId}
+      this.dialogFormVisible3 = true
+    },
+    filterMethod(query, item) {
+      return !query || item.type === query;
+    },
+
     takePaper(paperId,courseId) {
       this.form1 = {type1: 4, type2: 4, type3: 2, paperId: paperId, courseId: courseId}
       this.dialogFormVisible1 = true
@@ -172,6 +206,16 @@ export default {
         if(res.code === '200'){
           this.$message.success("组卷成功")
           this.dialogFormVisible1 = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    generateHandPaper() {
+      this.request.post("/paper/handPaper", this.form2 ).then(res => {
+        if(res.code === '200'){
+          this.$message.success("组卷成功")
+          this.dialogFormVisible3 = false
         } else {
           this.$message.error(res.msg)
         }
