@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin: 0 0 10px 0">
-      <el-input style="width: 200px" placeholder="请输入课程名" suffix-icon="el-icon-search" v-model="name" ></el-input>
+      <el-input style="width: 200px" placeholder="请输入考试名称" suffix-icon="el-icon-search" v-model="name" ></el-input>
       <el-button style="margin-left: 5px" type="primary" @click="load">搜索</el-button>
       <el-button style="margin-left: 5px" type="warning" @click="reset">重置</el-button>
     </div>
@@ -21,11 +21,17 @@
     </div>
     <el-table :data="tableData" border stripe header-cell-class-name="'headerBg'" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="课程ID">
+      <el-table-column prop="id" label="考试ID">
       </el-table-column>
-      <el-table-column prop="name" label="课程名">
+      <el-table-column prop="name" label="考试名称">
       </el-table-column>
-      <el-table-column prop="detail" label="描述">
+      <el-table-column prop="time" label="考试时间">
+      </el-table-column>
+      <el-table-column prop="teacherId" label="负责人ID">
+      </el-table-column>
+      <el-table-column prop="state" label="考试状态">
+      </el-table-column>
+      <el-table-column prop="paperId" label="试卷Id">
       </el-table-column>
 
       <el-table-column label="操作" width="162">
@@ -57,13 +63,22 @@
       </el-pagination>
     </div>
 
-    <el-dialog title="课程信息" :visible.sync="dialogFormVisible" width="30%">
+    <el-dialog title="考试信息" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-width="80px" size="small">
-        <el-form-item label="课程名">
+        <el-form-item label="考试名">
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="form.detail" autocomplete="off"></el-input>
+        <el-form-item label="考试时间">
+          <el-date-picker v-model="form.time" type="datetime"  format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" placeholder="选择日期时间"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="负责人ID">
+          <el-input v-model="form.teacherId" autocomplete="off"></el-input>
+        </el-form-item>
+<!--        <el-form-item label="考试状态">-->
+<!--          <el-input v-model="form.state" autocomplete="off"></el-input>-->
+<!--        </el-form-item>-->
+        <el-form-item label="试卷ID">
+          <el-input v-model="form.paperId" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -76,7 +91,7 @@
 
 <script>
 export default {
-  name: "Course",
+  name: "Exam",
   data() {
     return {
       tableData: [],
@@ -95,7 +110,7 @@ export default {
   },
   methods: {
     load() {
-      this.request.get("/course/page",{
+      this.request.get("/exam/page",{
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
@@ -109,7 +124,7 @@ export default {
 
     },
     save() {
-      this.request.post("/course",this.form).then(res => {
+      this.request.post("/exam",this.form).then(res => {
         if(res){
           this.$message.success("保存成功")
           this.dialogFormVisible = false
@@ -132,7 +147,7 @@ export default {
     },
     delBatch() {
       let ids = this.multipleSelection.map(v => v.id) //把对象数组转换为纯id的数组
-      this.request.post("/course/del/batch", ids).then(res => {
+      this.request.post("/exam/del/batch", ids).then(res => {
         if(res){
           this.$message.success("批量删除成功")
           this.load()
@@ -146,7 +161,7 @@ export default {
       this.dialogFormVisible = true
     },
     handleDelete(id) {
-      this.request.delete("/course/" + id).then(res => {
+      this.request.delete("/exam/" + id).then(res => {
         if(res){
           this.$message.success("删除成功")
           this.load()

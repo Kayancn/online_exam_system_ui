@@ -16,7 +16,7 @@
       <span slot="title">主页</span>
     </el-menu-item>
 
-    <el-menu-item index="2">
+    <el-menu-item index="/manage/exam">
       <i class="el-icon-menu"></i>
       <span slot="title">考试管理</span>
     </el-menu-item>
@@ -27,7 +27,7 @@
         <span slot="title">资源管理</span>
       </template>
       <el-menu-item index="/manage/course">课程管理</el-menu-item>
-      <el-menu-item index="3-1">试卷管理</el-menu-item>
+      <el-menu-item index="/manage/paper">试卷管理</el-menu-item>
       <el-menu-item index="/manage/question">题目管理</el-menu-item>
     </el-submenu>
 

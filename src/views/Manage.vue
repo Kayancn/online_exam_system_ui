@@ -22,7 +22,7 @@ import Aside from "@/components/Aside";
 import Header from "@/components/Header";
 
 export default {
-  name: 'HomeView',
+  name: 'Manage',
   data() {
     return {
       collapseBtnClass: 'el-icon-s-fold',

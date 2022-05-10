@@ -1,15 +1,7 @@
 <template>
   <div>
     <div style="margin: 0 0 10px 0">
-      <el-input style="width: 200px" placeholder="请输入题目" suffix-icon="el-icon-search" v-model="name"></el-input>
-      <el-select clearable v-model="courseId" placeholder="请选择课程" style="width: 200px; margin-left: 5px">
-        <el-option v-for="item in courses"
-                   :key="item.id" :label="item.name" :value="item.id"></el-option>
-      </el-select>
-      <el-select clearable v-model="type" placeholder="请选择题目类型" style="width: 200px; margin-left: 5px">
-        <el-option v-for="item in [{name:'选择题',value: 1},{name:'判断题',value: 2},{name:'问答题',value: 3}]"
-                   :key="item.value" :label="item.name" :value="item.value"></el-option>
-      </el-select>
+      <el-input style="width: 200px" placeholder="请输入试卷名称" suffix-icon="el-icon-search" v-model="name" ></el-input>
       <el-button style="margin-left: 5px" type="primary" @click="load">搜索</el-button>
       <el-button style="margin-left: 5px" type="warning" @click="reset">重置</el-button>
     </div>
@@ -29,39 +21,24 @@
     </div>
     <el-table :data="tableData" border stripe header-cell-class-name="'headerBg'" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="题目ID">
+      <el-table-column prop="id" label="试卷ID">
       </el-table-column>
-      <el-table-column prop="name" label="题目">
+      <el-table-column prop="name" label="试卷名称">
       </el-table-column>
       <el-table-column prop="courseName" label="所属课程">
         <template v-slot="scope">
           <span>{{courses.find(v => v.id === scope.row.courseId).name}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="type" label="类型">
-        <template v-slot="scope">
-          <span v-if="scope.row.type === 1">选择题</span>
-          <span v-if="scope.row.type === 2">判断题</span>
-          <span v-if="scope.row.type === 3">问答题</span>
-        </template>
+      <el-table-column prop="score" label="试卷总分">
       </el-table-column>
-      <el-table-column prop="a" label="选项A">
-      </el-table-column>
-      <el-table-column prop="b" label="选项B">
-      </el-table-column>
-      <el-table-column prop="c" label="选项C">
-      </el-table-column>
-      <el-table-column prop="d" label="选项D">
-      </el-table-column>
-      <el-table-column prop="score" label="分数">
-      </el-table-column>
-      <el-table-column prop="answer" label="答案">
-      </el-table-column>
-      <el-table-column prop="detail" label="解析">
+      <el-table-column prop="duration" label="时长(分)">
       </el-table-column>
 
-      <el-table-column label="操作" width="162">
+      <el-table-column label="操作" width="380">
         <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="takePaper(scope.row.id,scope.row.courseId)">组卷<i class="el-icon-document"></i></el-button>
+          <el-button type="primary" size="mini" @click="viewPaper(scope.row.id)">查看试卷<i class="el-icon-document"></i></el-button>
           <el-button type="success" size="mini" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit"></i></el-button>
           <el-popconfirm
               style="margin-left: 5px"
@@ -89,13 +66,53 @@
       </el-pagination>
     </div>
 
-    <el-dialog title="题目信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="120px" size="small">
-        <el-form-item label="类型">
-          <el-select clearable v-model="form.type" placeholder="请选择" style="width: 100%">
-            <el-option v-for="item in [{name:'选择题',value: 1},{name:'判断题',value: 2},{name:'问答题',value: 3}]"
-                       :key="item.value" :label="item.name" :value="item.value"></el-option>
-          </el-select>
+    <el-dialog title="题目信息" :visible.sync="dialogFormVisible2" width="60%">
+      <el-card>
+        <div v-for="(item, index) in questions" :key="item.id" style="margin: 20px 0">
+          <div style="margin: 10px 0; font-size: 20px"><span>{{index + 1}}. </span>{{item.name}}
+            <span style="font-size: 14px" v-if="item.type === 1">（选择题）</span>
+            <span style="font-size: 14px" v-if="item.type === 2">（判断题）</span>
+            <span style="font-size: 14px" v-if="item.type === 3">（问答题）</span>
+          </div>
+
+          <div v-if="item.type === 1" style="margin: 10px 0">
+            <span style="margin-right: 20px">A. {{item.a}}</span>
+            <span style="margin-right: 20px">B. {{item.b}}</span>
+            <span style="margin-right: 20px">C. {{item.c}}</span>
+            <span>D. {{item.d}}</span>
+          </div>
+          <div style="margin: 10px">
+            答案： {{item.answer}}
+          </div>
+          <div style="margin: 10px">
+            解析： {{item.detail}}
+          </div>
+        </div>
+      </el-card>
+    </el-dialog>
+
+    <el-dialog title="组卷信息" :visible.sync="dialogFormVisible1" width="20%">
+      <el-form label-width="100px" size="small">
+        <el-form-item label="选择题数量">
+          <el-input v-model="form1.type1" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="判断题数量">
+          <el-input v-model="form1.type2" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="问答题题数量">
+          <el-input v-model="form1.type3" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+        <el-button type="primary" @click="generatePaper">生 成 试 卷</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="试卷信息" :visible.sync="dialogFormVisible" width="30%">
+      <el-form label-width="80px" size="small">
+        <el-form-item label="试卷名称">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="所属课程">
           <el-select clearable v-model="form.courseId" placeholder="请选择" style="width: 100%">
@@ -103,41 +120,12 @@
                        :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="题目">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
+<!--        <el-form-item label="试卷总分">-->
+<!--          <el-input v-model="form.score" autocomplete="off"></el-input>-->
+<!--        </el-form-item>-->
+        <el-form-item label="时长(分)">
+          <el-input v-model="form.duration" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="选项A" v-if="form.type === 1">
-          <el-input v-model="form.a" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="选项B" v-if="form.type === 1">
-          <el-input v-model="form.b" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="选项C" v-if="form.type === 1">
-          <el-input v-model="form.c" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="选项D" v-if="form.type === 1">
-          <el-input v-model="form.d" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="分数">
-          <el-input v-model="form.score" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="答案" v-if="form.type === 1">
-          <el-radio v-model="form.answer" label="A">A</el-radio>
-          <el-radio v-model="form.answer" label="B">B</el-radio>
-          <el-radio v-model="form.answer" label="C">C</el-radio>
-          <el-radio v-model="form.answer" label="D">D</el-radio>
-        </el-form-item>
-        <el-form-item label="答案" v-if="form.type === 2">
-          <el-radio v-model="form.answer" label="正确">正确</el-radio>
-          <el-radio v-model="form.answer" label="错误">错误</el-radio>
-        </el-form-item>
-        <el-form-item label="答案" v-if="form.type === 3">
-          <el-input type="textarea" v-model="form.answer" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="解析">
-          <el-input v-model="form.detail" autocomplete="off"></el-input>
-        </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -149,21 +137,23 @@
 
 <script>
 export default {
-  name: "Question",
+  name: "Paper",
   data() {
     return {
       tableData: [],
       total: 0,
       pageNum: 1,
-      pageSize: 5,
+      pageSize: 10,
       name: "",
-      courseId: null,
-      type: null,
 
       dialogFormVisible: false,
+      dialogFormVisible1: false,
+      dialogFormVisible2: false,
       form: {},
+      form1: {},
       multipleSelection: [],
-      courses: []
+      courses: [],
+      questions: []
     }
   },
   created() {
@@ -173,14 +163,32 @@ export default {
     })
   },
   methods: {
+    takePaper(paperId,courseId) {
+      this.form1 = {type1: 4, type2: 4, type3: 2, paperId: paperId, courseId: courseId}
+      this.dialogFormVisible1 = true
+    },
+    generatePaper() {
+      this.request.post("/paper/takePaper", this.form1).then(res => {
+        if(res.code === '200'){
+          this.$message.success("组卷成功")
+          this.dialogFormVisible1 = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    viewPaper(paperId) {
+      this.request.get("/paper/view/" + paperId).then(res => {
+        this.questions = res.data
+        this.dialogFormVisible2 = true
+      })
+    },
     load() {
-      this.request.get("/question/page",{
+      this.request.get("/paper/page",{
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
-          name: this.name,
-          courseId: this.courseId,
-          type: this.type
+          name: this.name
         }
       }).then(res => {
         console.log(res)
@@ -190,7 +198,7 @@ export default {
 
     },
     save() {
-      this.request.post("/question",this.form).then(res => {
+      this.request.post("/paper",this.form).then(res => {
         if(res){
           this.$message.success("保存成功")
           this.dialogFormVisible = false
@@ -201,9 +209,7 @@ export default {
       })
     },
     reset() {
-      this.name = ""
-      this.courseId = null
-      this.type = null
+      this.name= ""
       this.load()
     },
     handleAdd() {
@@ -215,7 +221,7 @@ export default {
     },
     delBatch() {
       let ids = this.multipleSelection.map(v => v.id) //把对象数组转换为纯id的数组
-      this.request.post("/question/del/batch", ids).then(res => {
+      this.request.post("/paper/del/batch", ids).then(res => {
         if(res){
           this.$message.success("批量删除成功")
           this.load()
@@ -229,7 +235,7 @@ export default {
       this.dialogFormVisible = true
     },
     handleDelete(id) {
-      this.request.delete("/question/" + id).then(res => {
+      this.request.delete("/paper/" + id).then(res => {
         if(res){
           this.$message.success("删除成功")
           this.load()
