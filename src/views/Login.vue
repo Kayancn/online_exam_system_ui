@@ -36,7 +36,7 @@ export default {
       rules: {
         id: [
           { required: true, message: '请输入学号/工号', trigger: 'blur' },
-          { min: 5, max: 8, message: '长度在 5 到 8 个字符', trigger: 'blur' }
+          { min: 5, max: 10, message: '长度在 5 到 10 个字符', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -53,7 +53,7 @@ export default {
             this.request.post("/student/login", this.logger).then(res => {
               if(res.code === '200') {
                 localStorage.setItem("logger",JSON.stringify(res.data)) //存储用户信息到浏览器
-                this.$router.push("/exam")
+                this.$router.push("/learn")
                 this.$message.success("登录成功")
               } else {
                 this.$message.error(res.msg)
