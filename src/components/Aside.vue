@@ -15,6 +15,10 @@
       <i class="el-icon-house"></i>
       <span slot="title">主页</span>
     </el-menu-item>
+    <el-menu-item index="/manage/studentPaper">
+      <i class="el-icon-edit"></i>
+      <span slot="title">阅卷管理</span>
+    </el-menu-item>
 
     <el-menu-item index="/manage/exam">
       <i class="el-icon-menu"></i>

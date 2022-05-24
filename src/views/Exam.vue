@@ -27,9 +27,16 @@
       </el-table-column>
       <el-table-column prop="time" label="考试时间">
       </el-table-column>
+      <el-table-column prop="duration" label="考试时长（分）">
+      </el-table-column>
+      <el-table-column prop="password" label="考试密码">
+      </el-table-column>
       <el-table-column prop="teacherId" label="负责人ID">
       </el-table-column>
-      <el-table-column prop="state" label="考试状态">
+      <el-table-column prop="courseName" label="所属课程">
+        <template v-slot="scope">
+          <span>{{courses.find(v => v.id === scope.row.courseId).name ? courses.find(v => v.id === scope.row.courseId).name : ''}}</span>
+        </template>
       </el-table-column>
       <el-table-column prop="paperId" label="试卷Id">
       </el-table-column>
@@ -68,11 +75,23 @@
         <el-form-item label="考试名">
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="考试密码">
+          <el-input v-model="form.password" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="考试时间">
           <el-date-picker v-model="form.time" type="datetime"  format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
+        <el-form-item label="考试时长（分）">
+          <el-input v-model="form.duration" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="负责人ID">
           <el-input v-model="form.teacherId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="所属课程">
+          <el-select clearable v-model="form.courseId" placeholder="请选择" style="width: 100%">
+            <el-option v-for="item in courses"
+                       :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
 <!--        <el-form-item label="考试状态">-->
 <!--          <el-input v-model="form.state" autocomplete="off"></el-input>-->
@@ -102,7 +121,8 @@ export default {
 
       dialogFormVisible: false,
       form: {},
-      multipleSelection: []
+      multipleSelection: [],
+      courses: []
     }
   },
   created() {
@@ -120,6 +140,9 @@ export default {
         console.log(res)
         this.tableData = res.records
         this.total = res.total
+      })
+      this.request.get("/course").then(res => {
+        this.courses = res
       })
 
     },
